@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import useColorControl from "@/controllers/color.control";
-import { useAuthForm } from "@/hooks/useAuthForm";
+import { useAuthForm } from "@/hooks/auth/useAuthForm";
 import AuthHeader from "./AuthHeader";
 import AuthInput from "./AuthInput";
 import AuthFooter from "./AuthFooter";

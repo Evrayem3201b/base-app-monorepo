@@ -1,8 +1,8 @@
 // hooks/useAuthForm.ts
 import { useState, useRef, useEffect } from "react";
-import { handleSignUp } from "../lib/auth/handleSignUp";
-import { handleSignIn } from "../lib/auth/handleSignIn";
-import { authClient } from "../lib/auth/auth-client";
+import { handleSignUp } from "../../lib/auth/handleSignUp";
+import { handleSignIn } from "../../lib/auth/handleSignIn";
+import { authClient } from "../../lib/auth/auth-client";
 import { signInSchema, signUpSchema, SignInOrSignUp } from "@/schemas/auth/auth.schema";
 import { z } from "zod";
 

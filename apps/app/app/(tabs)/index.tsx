@@ -3,7 +3,7 @@ import { Text, View } from "@/components/Themed";
 import AdminDashboardLink from "@/components/auth/AdminDashboardLink";
 import SignOutButton from "@/components/auth/SignOutButton";
 import DeleteAccountButton from "@/components/auth/DeleteAccountButton";
-import { useUserData } from "@/hooks/useUserData";
+import { useUserData } from "@/hooks/auth/useUserData";
 
 export default function TabOneScreen() {
   const userData = useUserData();

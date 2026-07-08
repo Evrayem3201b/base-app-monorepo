@@ -8,9 +8,7 @@ import { auth } from "./lib/auth.js";
 import { config } from "./lib/config.js";
 import { requireAuth } from "./middleware/auth.js";
 
-const app = new Hono();
-
-app
+const app = new Hono()
   .use("/*", logger())
   .use("/*", secureHeaders())
   .use(
