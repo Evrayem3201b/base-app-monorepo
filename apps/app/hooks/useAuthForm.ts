@@ -1,8 +1,23 @@
 // hooks/useAuthForm.ts
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { handleSignUp } from "../lib/auth/handleSignUp";
 import { handleSignIn } from "../lib/auth/handleSignIn";
 import { authClient } from "../lib/auth/auth-client";
+import { signInSchema, signUpSchema, SignInOrSignUp } from "@/schemas/auth/auth.schema";
+import { z } from "zod";
+
+// Known Better Auth error codes mapped to friendlier copy.
+// Fall back to result.error.message for anything not listed here.
+const ERROR_MESSAGES: Record<string, string> = {
+  USER_ALREADY_EXISTS: "An account with this email already exists.",
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: "An account with this email already exists.",
+  INVALID_EMAIL_OR_PASSWORD: "Incorrect email or password.",
+  INVALID_PASSWORD: "Incorrect password.",
+  INVALID_EMAIL: "Please enter a valid email address.",
+  BANNED_USER: "This account has been suspended.",
+  EMAIL_NOT_VERIFIED: "Please verify your email before signing in.",
+  WEAK_PASSWORD: "Please choose a stronger password (at least 8 characters).",
+};
 
 export function useAuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -15,51 +30,105 @@ export function useAuthForm() {
   const [verificationPending, setVerificationPending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(false);
 
+  const isMounted = useRef(true);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+      if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
+    };
+  }, []);
+
+  function validate(): { data?: SignInOrSignUp; error?: string } {
+    const schema = isSignUp ? signUpSchema : signInSchema;
+    const result = schema.safeParse({ email, password, name });
+
+    if (!result.success) {
+      // surface the first issue only — good enough for a single formError string
+      const firstIssue = result.error.issues[0];
+      return { error: firstIssue?.message ?? "Please check your input." };
+    }
+
+    return { data: result.data };
+  }
+
+  function resolveErrorMessage(error: { code?: string; status?: number; message?: string }): string {
+    if (error.status === 429) {
+      return "Too many attempts. Please wait a moment and try again.";
+    }
+    if (error.code && ERROR_MESSAGES[error.code]) {
+      return ERROR_MESSAGES[error.code];
+    }
+    return error.message || "Something went wrong. Please try again.";
+  }
+
   async function submit() {
+    if (isLoading) return; // guard against double-submit
+
     setFormError(null);
 
-    if (!email || !password || (isSignUp && !name)) {
-      setFormError("Please fill in all fields.");
+    const { data, error: validationError } = validate();
+    if (validationError || !data) {
+      setFormError(validationError ?? "Please check your input.");
       return;
     }
 
     setIsLoading(true);
-    const result = isSignUp
-      ? await handleSignUp({ email, password, name })
-      : await handleSignIn({ email, password });
+
+    let result;
+    try {
+      result = isSignUp
+        ? await handleSignUp(data as z.infer<typeof signUpSchema>)
+        : await handleSignIn(data as z.infer<typeof signInSchema>);
+    } catch (err) {
+      if (isMounted.current) {
+        setIsLoading(false);
+        setFormError("Network error. Check your connection and try again.");
+      }
+      return;
+    }
+
+    if (!isMounted.current) return;
     setIsLoading(false);
 
     if (!result.success) {
-      // Better Auth returns this specific code when sign-in is blocked pending verification
       if (result.error.code === "EMAIL_NOT_VERIFIED") {
         setVerificationPending(true);
         return;
       }
-      setFormError(result.error.message);
+      setFormError(resolveErrorMessage(result.error));
       return;
     }
 
     if (isSignUp) {
-      // sign-up succeeded but requireEmailVerification blocks real access until confirmed
       setVerificationPending(true);
     }
   }
 
   async function resendVerification() {
-    if (resendCooldown) return;
+    if (resendCooldown || !email.trim()) return;
+
     setResendCooldown(true);
     setFormError(null);
 
     try {
-      await authClient.sendVerificationEmail({
-        email,
+      const { error } = await authClient.sendVerificationEmail({
+        email: email.trim().toLowerCase(),
         callbackURL: "/",
       });
+      if (error && isMounted.current) {
+        setFormError(resolveErrorMessage(error));
+      }
     } catch (err) {
-      setFormError("Couldn't resend the email. Try again in a moment.");
+      if (isMounted.current) {
+        setFormError("Couldn't resend the email. Check your connection and try again.");
+      }
     }
 
-    setTimeout(() => setResendCooldown(false), 30_000); // basic 30s cooldown
+    cooldownTimer.current = setTimeout(() => {
+      if (isMounted.current) setResendCooldown(false);
+    }, 30_000);
   }
 
   return {

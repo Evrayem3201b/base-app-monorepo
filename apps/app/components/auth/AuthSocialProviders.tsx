@@ -10,8 +10,10 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Text } from "@/components/Themed";
 import { authClient } from "@/lib/auth/auth-client";
 
+
+
 interface AuthSocialProvidersProps {
-  colors: any
+  colors: any;
 }
 
 export default function AuthSocialProviders({ colors }: AuthSocialProvidersProps) {
@@ -22,35 +24,30 @@ export default function AuthSocialProviders({ colors }: AuthSocialProvidersProps
     
     try {
       setActiveLoading(provider);
-      
-      await authClient.signIn.social({
-        provider,
-        // callbackURL: Platform.OS === "web" ? window.location.origin : "app://",
-      });
+      await authClient.signIn.social({ provider });
     } catch (error) {
-    //   console.error(`💥 Clerk-Social error on ${provider}:`, error);
+      // Error handling
     } finally {
       setActiveLoading(null);
     }
   };
 
   const isAnyLoading = activeLoading !== null;
+  const secondaryTextColor = colors.textSecondary ?? colors.text;
 
   return (
     <View style={styles.container}>
-      {/* Clerk Style Minimalist Divider */}
+      {/* Premium Minimalist Divider */}
       <View style={styles.dividerContainer}>
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
-        <Text style={[styles.dividerText, { color: colors.textSecondary ?? colors.text }]}>
+        <Text style={[styles.dividerText, { color: secondaryTextColor }]}>
           or continue with
         </Text>
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
       </View>
 
-      {/* Grid Layout Row */}
+      {/* Button Layout */}
       <View style={styles.buttonGroupRow}>
-        
-        {/* Google Provider Button */}
         <Pressable
           disabled={isAnyLoading}
           onPress={() => handleSocialSignIn("google")}
@@ -58,48 +55,22 @@ export default function AuthSocialProviders({ colors }: AuthSocialProvidersProps
             styles.socialButton,
             {
               backgroundColor: pressed 
-                ? (Platform.OS === "ios" ? "rgba(0,0,0,0.03)" : colors.border) 
+                ? (Platform.OS === "ios" ? "rgba(0, 0, 0, 0.02)" : colors.border) 
                 : colors.card,
               borderColor: colors.border,
-              opacity: isAnyLoading && activeLoading !== "google" ? 0.5 : 1,
+              opacity: isAnyLoading ? 0.7 : 1,
             },
           ]}
         >
           {activeLoading === "google" ? (
             <ActivityIndicator size="small" color={colors.text} />
           ) : (
-            <>
-              <Ionicons name="logo-google" size={18} color="#DB4437" />
+            <View style={styles.buttonContent}>
+              <Ionicons name="logo-google" size={17} color="#DB4437" />
               <Text style={[styles.buttonLabel, { color: colors.text }]}>Google</Text>
-            </>
+            </View>
           )}
         </Pressable>
-
-        {/* Facebook Provider Button */}
-        <Pressable
-          disabled={isAnyLoading}
-          onPress={() => handleSocialSignIn("facebook")}
-          style={({ pressed }) => [
-            styles.socialButton,
-            {
-              backgroundColor: pressed 
-                ? (Platform.OS === "ios" ? "rgba(0,0,0,0.03)" : colors.border) 
-                : colors.card,
-              borderColor: colors.border,
-              opacity: isAnyLoading && activeLoading !== "facebook" ? 0.5 : 1,
-            },
-          ]}
-        >
-          {activeLoading === "facebook" ? (
-            <ActivityIndicator size="small" color="#1877F2" />
-          ) : (
-            <>
-              <Ionicons name="logo-facebook" size={18} color="#1877F2" />
-              <Text style={[styles.buttonLabel, { color: colors.text }]}>Facebook</Text>
-            </>
-          )}
-        </Pressable>
-        
       </View>
     </View>
   );
@@ -108,13 +79,13 @@ export default function AuthSocialProviders({ colors }: AuthSocialProvidersProps
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    marginTop: -115,
-    gap: 20,
+    // Using a tight structural gap to keep it visually anchored to whatever is above it
+    gap: 16, 
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 2,
+    width: "100%",
   },
   divider: {
     flex: 1,
@@ -122,41 +93,45 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   dividerText: {
-    fontSize: 13,
-    fontWeight: "400",
+    fontSize: 12,
+    fontWeight: "500",
     letterSpacing: -0.1,
     paddingHorizontal: 12,
+    textTransform: "lowercase",
+    opacity: 0.6,
   },
   buttonGroupRow: {
     flexDirection: "row",
     width: "100%",
-    gap: 12,
   },
   socialButton: {
     flex: 1,
-    height: 48, // Clerk components default to compact, highly professional heights
-    borderRadius: 10, // Exact subtle rounded corner standard
+    height: 48, 
+    borderRadius: 12, 
     borderWidth: 1,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
-    // Native transitions properties
     ...Platform.select({
       ios: {
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.02,
-        shadowRadius: 1,
+        shadowRadius: 2,
       },
       android: {
-        elevation: 0, // Clerk uses strict flat UI styling parameters
+        elevation: 0,
       },
     }),
   },
+  buttonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
   buttonLabel: {
     fontSize: 14,
-    fontWeight: "500", // Clerk shifts away from heavy bold weights to premium medium weights
-    letterSpacing: -0.1,
+    fontWeight: "600", 
+    letterSpacing: -0.2,
   },
 });
