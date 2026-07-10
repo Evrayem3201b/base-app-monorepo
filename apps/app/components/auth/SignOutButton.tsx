@@ -1,6 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text, Alert, StyleSheet, Pressable } from "react-native";
 import { authClient } from "@/lib/auth/auth-client";
+import Button from "../ui/Button";
 
 export default function SignOutButton() {
   async function handleSignOut() {
@@ -13,9 +14,8 @@ export default function SignOutButton() {
   }
 
   return (
-    <Pressable style={styles.button} onPress={handleSignOut}>
-      <Text>Sign Out</Text>
-    </Pressable>
+    <Button label="Sign Out" variant="secondary" onPress={handleSignOut} />
+      
   );
 }
 

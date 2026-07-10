@@ -1,61 +1,73 @@
-const tintColorLight = "#007AFF";
-const tintColorDark = "#FFFFFF";
+const PRIMARY = "#0B5CAD";
+
+const common = {
+  accent: PRIMARY,
+};
 
 export default {
   light: {
-    // Foundational Core
+    ...common,
+
+    // Foundation
     text: "#000000",
-    textSecondary: "#636366", // Added: Used for subtitle notes and secondary text fields
+    textSecondary: "#636366",
+    secondaryText: "#636366", // Backwards compatibility
     background: "#FFFFFF",
-    card: "#FFFFFF",          // Added: White background surface for elevated layout blocks/social buttons
-    border: "#E5E5EA",        // Added: Crisp, clean structural component border token
-    tint: tintColorLight,
-    
-    // Tab Navigation
+    card: "#FFFFFF",
+    border: "#E5E5EA",
+
+    // Navigation
+    tint: PRIMARY,
     tabIconDefault: "#C7C7CC",
-    tabIconSelected: tintColorLight,
-    
-    // Premium Interactive Form Elements
-    secondaryText: "#636366", // Kept for backward compatibility
+    tabIconSelected: PRIMARY,
+
+    // Inputs
     inputBg: "#F2F2F7",
     inputBorder: "#E5E5EA",
-    inputFocus: "#000000",
-    buttonBg: "#000000",
+    inputFocus: PRIMARY,
+
+    // Buttons
+    buttonBg: PRIMARY,
     buttonText: "#FFFFFF",
-    accent: "#007AFF",
-    
-    // Feedback States (Alerts & Validation Notices)
-    error: "#FF3B30",         // System Red
-    errorBg: "rgba(255, 59, 48, 0.08)",  // Soft red tint for error card fills
-    success: "#34C759",       // System Green
-    successBg: "rgba(52, 199, 89, 0.08)", // Soft green tint for success notice fills
+
+    // Feedback
+    error: "#FF3B30",
+    errorBg: "rgba(255, 59, 48, 0.08)",
+    success: "#34C759",
+    successBg: "rgba(52, 199, 89, 0.08)",
   },
+
   dark: {
-    // Foundational Core
+    ...common,
+
+    // Foundation
     text: "#FFFFFF",
-    textSecondary: "#8E8E93", // Added: Accessible low-contrast text for pure black environments
-    background: "#000000",    // True OLED Black background architecture
-    card: "#1C1C1E",          // Added: Subtle gray elevation wrapper over deep black backgrounds
-    border: "#2C2C2E",        // Added: High-contrast border separation rule
-    tint: tintColorDark,
+    textSecondary: "#A1A1AA",
+    secondaryText: "#A1A1AA", // Backwards compatibility
+    background: "#0b0b0b",
+    card: "#1C1C1E",
+    border: "#2C2C2E",
     
-    // Tab Navigation
+    icon: "#1b1b1d6d",
+
+    // Navigation
+    tint: "#FFFFFF",
     tabIconDefault: "#48484A",
-    tabIconSelected: tintColorDark,
-    
-    // Premium Interactive Form Elements
-    secondaryText: "#8E8E93", // Kept for backward compatibility
+    tabIconSelected: "#FFFFFF",
+
+    // Inputs
     inputBg: "#1C1C1E",
     inputBorder: "#2C2C2E",
-    inputFocus: "#FFFFFF",
-    buttonBg: "#FFFFFF",
-    buttonText: "#000000",
-    accent: "#0A84FF",        // Bright Apple system accessibility blue
-    
-    // Feedback States (Alerts & Validation Notices)
-    error: "#FF453A",         // High-accessibility dark mode red
+    inputFocus: PRIMARY,
+
+    // Buttons
+    buttonBg: PRIMARY,
+    buttonText: "#FFFFFF",
+
+    // Feedback
+    error: "#FF453A",
     errorBg: "rgba(255, 69, 58, 0.12)",
-    success: "#30D158",       // High-accessibility dark mode green
+    success: "#30D158",
     successBg: "rgba(48, 209, 88, 0.12)",
   },
-};
+} as const;

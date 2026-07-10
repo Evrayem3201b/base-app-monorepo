@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet, Pressable } from "react-native";
 import { router } from "expo-router";
 import { authClient } from "@/lib/auth/auth-client";
+import Button from "../ui/Button";
 
 export default function AdminDashboardLink() {
   const { data: session } = authClient.useSession();
@@ -10,9 +11,7 @@ export default function AdminDashboardLink() {
   if (!isAdmin) return null;
 
   return (
-    <Pressable style={styles.button} onPress={() => router.push("/(admin)")}>
-      <Text>Go to Admin Dashboard</Text>
-    </Pressable>
+    <Button label="Go to Admin Dashboard" variant="primary" onPress={() => router.push("/(admin)")} />
   );
 }
 

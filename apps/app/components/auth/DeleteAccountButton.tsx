@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { TouchableOpacity, Text, Alert, StyleSheet, TextInput, Modal, View } from "react-native";
 import { authClient } from "@/lib/auth/auth-client";
+import Button from "../ui/Button";
 
 export default function DeleteAccountButton() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -46,9 +47,9 @@ export default function DeleteAccountButton() {
 
   return (
     <>
-      <TouchableOpacity style={styles.button} onPress={confirmDelete}>
-        <Text style={styles.text}>Delete Account</Text>
-      </TouchableOpacity>
+      <Button label="Delete Account" variant="danger" onPress={confirmDelete} />
+  
+    
 
       <Modal visible={modalVisible} transparent animationType="fade">
         <View style={styles.overlay}>
